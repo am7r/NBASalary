@@ -19,9 +19,11 @@ class Player():
         return self.__str__()
 
 class Team():
-    def __init__(self, name):
-        name = self.name
-        players = []
+
+    def __init__(self, teamName, totalSalary, playersArr):
+        self.name = teamName
+        self.players = playersArr
+        self.cap = totalSalary
 
 
 def checkForMaxMin(player, averageCap):
@@ -34,16 +36,33 @@ def checkForMaxMin(player, averageCap):
     else:
         return -2
     
-data = pd.read_csv("warriorsMergedData.csv")
 
-# Create Player objects
-players = []
-for _, row in data.iterrows():
-    player_stats = row.to_dict()  # Convert row to dictionary
-    player = Player(**player_stats)  # Pass dictionary as keyword arguments
-    players.append(player)
 
-for player in players:
-    print(f"--- Player: {player.Player} ---")  # Assuming 'Player' is a column in your CSV
-    print(player)
-    print()
+teamsFinal = ['Blazers', 'Bucks', 'Bulls', 'Cavaliers', 'Celtics', 'Clippers', 'Grizzlies', 'Hawks', 'Heat', 'Hornets', 'Jazz', 'Kings', 'Knicks', 'Lakers', 'Magic', 'Mavericks', 'Nets', 'Nuggets', 'Pacers', 'Pelicans', 'Pistons', 'Raptors', 'Rockets', 'Spurs', 'Suns', 'Thunder', 'Wolves', 'Warriors', 'Wizards', 'Sixers']
+teamsTest = ["Warriors"]
+teams = []
+for team in teamsTest: # need to be changed later
+    fileName = f"data/{team}MergedData.csv"
+    data = pd.read_csv(fileName)
+
+    players = []
+    totalSal = 0
+
+    for _, row in data.iterrows():
+        player_stats = row.to_dict()  # Convert row to dictionary
+        player = Player(**player_stats)  # Pass dictionary as keyword arguments
+        players.append(player)
+        if player.salary != "":  
+            totalSal += player.salary
+
+    currTeam = Team(team, totalSal, players)
+    teams.append(currTeam)
+
+    # printer function to test (not needed)
+
+for t in teams:
+    print(t.name)
+    for p in t.players:
+        print(p.Player)
+        print()
+    print(t.cap)

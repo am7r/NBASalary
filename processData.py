@@ -30,15 +30,16 @@ def processData(teamName):
     mergeData = mergeData.drop(columns=columns_to_drop, errors='ignore')
 
     # Drop additional unnecessary columns
-    additional_columns_to_drop = ['Awards_y', 'Player-additional_y', 'Awards_x', 'Player-additional_x', 'Guaranteed']
+    additional_columns_to_drop = ['Awards_y', 'Player-additional_y', 'Awards_x', 'Player-additional_x', 'Guaranteed', 'Rk_x']
     mergeData = mergeData.drop(columns=additional_columns_to_drop, errors='ignore')
 
     mergeData['2024-25'] = mergeData['2024-25'].replace(r'[\$,]', '', regex=True).astype(float)
+    mergeData['2024-25'] = pd.to_numeric(mergeData['2024-25'], errors='coerce').fillna(0)
 
 
     # Save the processed data
-    mergeData.to_csv(f"{teamName}MergedData.csv", index=False)
+    mergeData.to_csv(f"data/{teamName}MergedData.csv", index=False)
     print(f"Processed data saved to {teamName}MergedData.csv")
 
 # Process the Warriors data
-processData("warriors")
+processData("Warriors")
