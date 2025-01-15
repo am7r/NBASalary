@@ -2,6 +2,13 @@ import pandas as pd
 
 # getattr(player, '3P', 'N/A')
 
+class NBA():
+    def __init__(self, super, min, max):
+        self.super = super
+        self.max = min
+        self.min = max
+
+
 class Player():
     def __init__(self, team, **kwargs):
         # Dynamically assign all key-value pairs as attributes
@@ -31,14 +38,29 @@ class Team():
 
 
 def checkForMaxMin(player, averageCap):
+    min_salary_table = {
+        0: 1157153,
+        1: 1862265,
+        2: 2087519,
+        3: 2162606,
+        4: 2237691,
+        5: 2425403,
+        6: 2613120,
+        7: 2800834,
+        8: 2988550,
+        9: 3003427,
+        10: 3303771  
+    }
+
     if player.salary/averageCap >= 0.33: # is supermax
         return 1
     elif player.salary/averageCap >= 0.23: # is max
         return 0
-    elif player.salary <= 2400000.0: # is min
-        print(player.Player)
-        return -1
     else:
+        exp = player.Exp + 1
+        min_salary = min_salary_table[10] if exp >= 10 else min_salary_table.get(exp, 0)
+        if player.salary <= min_salary:
+            return -1
         return -2
     
 
@@ -67,20 +89,24 @@ def setUpTeams():
 
 def setUpMax(team):
     cap = 140000000
+    superSal = minSal = maxSal = []
     for p in team.players:
         temp = checkForMaxMin(p, cap)
-        print(temp)
         if temp == 1:
             p.isSuper = True
+            superSal.append(p)
         if temp == 0:
             p.isMax = True
+            maxSal.append(p)
         if temp == -1:
             p.isMin = True
+            minSal.append(p)
+    return superSal, minSal, maxSal
         
 
 holder = setUpTeams()
 for t in holder:
-    setUpMax(t)
+    sup, minS, maxS = setUpMax(t)
 
 for t in holder:
     for x in t.players:
@@ -90,5 +116,7 @@ for t in holder:
             print(x.Player, "is Max player")
         elif x.isMin:
             print(x.Player, "is on a minimum")
-
+            print(x.salary)
+print(holder[0].cap)
+LEAGUE = NBA(sup, minS, maxS)
 
