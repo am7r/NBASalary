@@ -2,8 +2,38 @@ import pandas as pd
 
 # getattr(player, '3P', 'N/A')
 
+# Constants for NBA salary caps and thresholds
+NBA_SALARY_CAP = 140000000
+SUPERMAX_THRESHOLD = 0.33  # 33% of cap
+MAX_THRESHOLD = 0.23      # 23% of cap
+
+# Minimum salary table based on years of experience
+MIN_SALARY_TABLE = {
+    0: 1157153,  # Rookie
+    1: 1862265,
+    2: 2087519,
+    3: 2162606,
+    4: 2237691,
+    5: 2425403,
+    6: 2613120,
+    7: 2800834,
+    8: 2988550,
+    9: 3003427,
+    10: 3303771  # 10+ years
+}
+
+# Salary tier definitions (low, high, tier_name)
+TIER_RANGES = [
+    (25000000, 31830356, "t1"),
+    (20000000, 25000000, "t2"),
+    (15000000, 20000000, "t3"),
+    (10000000, 15000000, "t4"),
+    (5000000, 10000000, "t5"),
+    (0, 5000000, "t6")
+]
+
 class NBA():
-    def __init__(self, superV, mini, maxi, t1, t2, t3, t4, t5, t6):
+    def __init__(self, superV, mini, maxi, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center):
         self.super = superV
         self.max = mini
         self.min = maxi
@@ -13,6 +43,11 @@ class NBA():
         self.t4 = t4
         self.t5 = t5
         self.t6 = t6
+        self.pg = pg 
+        self.sg = sg 
+        self.sf = sf 
+        self.pf = pf 
+        self.center = center
 
 
 class Player():
@@ -41,27 +76,13 @@ class Team():
 
 
 def checkForMaxMin(player, averageCap):
-    min_salary_table = {
-        0: 1157153,
-        1: 1862265,
-        2: 2087519,
-        3: 2162606,
-        4: 2237691,
-        5: 2425403,
-        6: 2613120,
-        7: 2800834,
-        8: 2988550,
-        9: 3003427,
-        10: 3303771  
-    }
-
-    if player.salary/averageCap >= 0.33: # is supermax
+    if player.salary/averageCap >= SUPERMAX_THRESHOLD:  # is supermax
         return 1
-    elif player.salary/averageCap >= 0.23: # is max
+    elif player.salary/averageCap >= MAX_THRESHOLD:  # is max
         return 0
     else:
         exp = player.Exp + 1
-        min_salary = min_salary_table[10] if exp >= 10 else min_salary_table.get(exp, 0)
+        min_salary = MIN_SALARY_TABLE[10] if exp >= 10 else MIN_SALARY_TABLE.get(exp, 0)
         if player.salary <= min_salary:
             return -1
         return -2
@@ -92,24 +113,29 @@ def setUpTeams():
 
 
 def segregatingContracts(team):
-    cap = 140000000
     # Initialize empty lists for each salary tier
     superSal, minSal, maxSal = [], [], []
     t1, t2, t3, t4, t5, t6 = [], [], [], [], [], []
-
-    # Salary tier thresholds
-    tier_ranges = [
-        (25000000, 31830356, t1, "t1"),
-        (20000000, 25000000, t2, "t2"), 
-        (15000000, 20000000, t3, "t3"),
-        (10000000, 15000000, t4, "t4"),
-        (5000000, 10000000, t5, "t5"),
-        (0, 5000000, t6, "t6")
-    ]
+    pg, sg, sf, pf, center = [], [], [], [], []
+    tier_lists = {"t1": t1, "t2": t2, "t3": t3, "t4": t4, "t5": t5, "t6": t6}
 
     for player in team.players:
-        contract_type = checkForMaxMin(player, cap)
+        contract_type = checkForMaxMin(player, NBA_SALARY_CAP)
         
+        # Categorize by position
+        pos = player.Pos_x
+        if pos == 'PG':
+            pg.append(player)
+        elif pos == 'SG':
+            sg.append(player)
+        elif pos == 'SF':
+            sf.append(player)
+        elif pos == 'PF':
+            pf.append(player)
+        elif pos == 'C':
+            center.append(player)
+        
+        # Categorize by salary tier
         if contract_type == 1:
             player.tier = "super"
             superSal.append(player)
@@ -120,43 +146,49 @@ def segregatingContracts(team):
             player.tier = "min"
             minSal.append(player)
         else:
-            # Categorize by salary tier
             salary = player.salary
-            for low, high, tier, tier_name in tier_ranges:
+            for low, high, tier_name in TIER_RANGES:
                 if low <= salary < high:
                     player.tier = tier_name
-                    tier.append(player)
+                    tier_lists[tier_name].append(player)
                     break
 
-    return superSal, minSal, maxSal, t1, t2, t3, t4, t5, t6
+    return superSal, minSal, maxSal, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center
     
-        
+
+def calculateAverages(tier, stat):
+    length = len(tier)
+    val = 0
+    for p in tier:
+        val += p.stat
+    return val / length
+
 
 holder = setUpTeams()
 for t in holder:
-    sup, minS, maxS, t1, t2, t3, t4, t5, t6 = segregatingContracts(t) # should be segregating contracts
+    sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center = segregatingContracts(t) # should be segregating contracts
 
 for t in holder:
     for x in t.players:
         if x.tier == "super":
-            print(x.Player, "is SuperMax")
+            print(f"{x.Player} ({x.Pos_x}) is SuperMax")
         elif x.tier == "max":
-            print(x.Player, "is Max player")
+            print(f"{x.Player} ({x.Pos_x}) is Max player")
         elif x.tier == "min":
-            print(x.Player, "is on a minimum")
+            print(f"{x.Player} ({x.Pos_x}) is on a minimum")
         elif x.tier == "t1":
-            print(x.Player, "is in Tier 1 ($25M-$31.8M)")
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 1 ($25M-$31.8M)")
         elif x.tier == "t2":
-            print(x.Player, "is in Tier 2 ($20M-$25M)")
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 2 ($20M-$25M)")
         elif x.tier == "t3":
-            print(x.Player, "is in Tier 3 ($15M-$20M)")
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 3 ($15M-$20M)")
         elif x.tier == "t4":
-            print(x.Player, "is in Tier 4 ($10M-$15M)")
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 4 ($10M-$15M)")
         elif x.tier == "t5":
-            print(x.Player, "is in Tier 5 ($5M-$10M)")
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 5 ($5M-$10M)")
         elif x.tier == "t6":
-            print(x.Player, "is in Tier 6 ($0-$5M)")
-LEAGUE = NBA(sup, minS, maxS, t1, t2, t3, t4, t5, t6)
+            print(f"{x.Player} ({x.Pos_x}) is in Tier 6 ($0-$5M)")
+LEAGUE = NBA(sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center)
 print(f"League:")
 print("\nSupermax Players:")
 for player in LEAGUE.super:
@@ -193,5 +225,27 @@ for player in LEAGUE.t5:
 print("\nTier 6 Players ($0-$5M):")
 for player in LEAGUE.t6:
     print(f"- {player.Player}")
+
+print("\nPoint Guards:")
+for player in LEAGUE.pg:
+    print(f"- {player.Player}")
+
+print("\nShooting Guards:")
+for player in LEAGUE.sg:
+    print(f"- {player.Player}")
+
+print("\nSmall Forwards:")
+for player in LEAGUE.sf:
+    print(f"- {player.Player}")
+
+print("\nPower Forwards:")
+for player in LEAGUE.pf:
+    print(f"- {player.Player}")
+
+print("\nCenters:")
+for player in LEAGUE.center:
+    print(f"- {player.Player}")
+
+
 
 
