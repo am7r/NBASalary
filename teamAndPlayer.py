@@ -1,4 +1,5 @@
 import pandas as pd
+import testing
 
 # getattr(player, '3P', 'N/A')
 
@@ -35,8 +36,8 @@ TIER_RANGES = [
 class NBA():
     def __init__(self, superV, mini, maxi, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center):
         self.super = superV
-        self.max = mini
-        self.min = maxi
+        self.min = mini
+        self.max = maxi
         self.t1 = t1
         self.t2 = t2
         self.t3 = t3
@@ -157,10 +158,12 @@ def segregatingContracts(team):
     
 
 def calculateAverages(tier, stat):
+    if not tier:  # Handle empty tier case
+        return 0
     length = len(tier)
     val = 0
     for p in tier:
-        val += p.stat
+        val += getattr(p, stat, 0)
     return val / length
 
 def calculateStandardDeviation(tier, stat):
@@ -187,84 +190,6 @@ holder = setUpTeams()
 for t in holder:
     sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center = segregatingContracts(t) # should be segregating contracts
 
-for t in holder:
-    for x in t.players:
-        if x.tier == "super":
-            print(f"{x.Player} ({x.Pos_x}) is SuperMax")
-        elif x.tier == "max":
-            print(f"{x.Player} ({x.Pos_x}) is Max player")
-        elif x.tier == "min":
-            print(f"{x.Player} ({x.Pos_x}) is on a minimum")
-        elif x.tier == "t1":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 1 ($25M-$31.8M)")
-        elif x.tier == "t2":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 2 ($20M-$25M)")
-        elif x.tier == "t3":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 3 ($15M-$20M)")
-        elif x.tier == "t4":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 4 ($10M-$15M)")
-        elif x.tier == "t5":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 5 ($5M-$10M)")
-        elif x.tier == "t6":
-            print(f"{x.Player} ({x.Pos_x}) is in Tier 6 ($0-$5M)")
 LEAGUE = NBA(sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center)
-print(f"League:")
-print("\nSupermax Players:")
-for player in LEAGUE.super:
-    print(f"- {player.Player}")
-
-print("\nMax Contract Players:") 
-for player in LEAGUE.max:
-    print(f"- {player.Player}")
-
-print("\nMinimum Contract Players:")
-for player in LEAGUE.min:
-    print(f"- {player.Player}")
-
-print("\nTier 1 Players ($25M-$31.8M):")
-for player in LEAGUE.t1:
-    print(f"- {player.Player}")
-
-print("\nTier 2 Players ($20M-$25M):")
-for player in LEAGUE.t2:
-    print(f"- {player.Player}")
-
-print("\nTier 3 Players ($15M-$20M):")
-for player in LEAGUE.t3:
-    print(f"- {player.Player}")
-
-print("\nTier 4 Players ($10M-$15M):")
-for player in LEAGUE.t4:
-    print(f"- {player.Player}")
-
-print("\nTier 5 Players ($5M-$10M):")
-for player in LEAGUE.t5:
-    print(f"- {player.Player}")
-
-print("\nTier 6 Players ($0-$5M):")
-for player in LEAGUE.t6:
-    print(f"- {player.Player}")
-
-print("\nPoint Guards:")
-for player in LEAGUE.pg:
-    print(f"- {player.Player}")
-
-print("\nShooting Guards:")
-for player in LEAGUE.sg:
-    print(f"- {player.Player}")
-
-print("\nSmall Forwards:")
-for player in LEAGUE.sf:
-    print(f"- {player.Player}")
-
-print("\nPower Forwards:")
-for player in LEAGUE.pf:
-    print(f"- {player.Player}")
-
-print("\nCenters:")
-for player in LEAGUE.center:
-    print(f"- {player.Player}")
-
-
-
-
+#testing.test(LEAGUE)
+#print(calculateStandardDeviation(t5, "PTS"))
