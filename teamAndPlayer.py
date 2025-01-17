@@ -163,6 +163,25 @@ def calculateAverages(tier, stat):
         val += p.stat
     return val / length
 
+def calculateStandardDeviation(tier, stat):
+    if not tier:  # Handle empty tier case
+        return 0
+        
+    # Calculate mean first
+    mean = calculateAverages(tier, stat)
+    
+    # Calculate sum of squared differences
+    squared_diff_sum = 0
+    for player in tier:
+        squared_diff_sum += (getattr(player, stat, 0) - mean) ** 2
+        
+    # Calculate variance and standard deviation
+    variance = squared_diff_sum / len(tier)
+    std_dev = variance ** 0.5
+    
+    return std_dev
+
+
 
 holder = setUpTeams()
 for t in holder:
