@@ -3,27 +3,58 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
 def scrapeSalaries(team):
-   
-    return df
+    url = f"https://www.basketball-reference.com/contracts/{team}.html"
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = soup.find("table", id="contracts")
+
+        if table:
+            # Extract table headers
+            headers = [header.text.strip() for header in table.find("thead").find_all("th")]
+            headers = headers[3:]
+
+            # Extract table rows
+            rows = []
+            for row in table.find("tbody").find_all("tr"):
+                cells = [cell.text.strip() for cell in row.find_all(["td", "th"])]
+                if cells:
+                    # Remove quotation marks and commas from salary data
+                    cells = [cell.replace('"', '').replace(',', '') for cell in cells]
+                    rows.append(cells)
+
+            df = pd.DataFrame(rows, columns=headers)
+            return(df)
+
+        else:
+            print("No table found on the page.")
+    else:
+        print(f"Failed to retrieve the page. Status code: {response.status_code}. Team: {team}")
+
+    return None
 
 # Example usage
 # Note: Use the team abbreviations as they appear in the URL
 # For example, Brooklyn Nets is "BRK" not "BKN"
-arrayOfAbreviations = ["GSW", "LAL", "BRK", "MIL", "PHO", "DEN", "MIA", "BOS", "CLE", "CHI", "DAL", "HOU", "MIN", "OKC", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"]
-arrayOfNames = ["Warriors", "Lakers", "Nets", "Bucks", "Suns", "Nuggets", "Heat", "Celtics", "Cavaliers", "Bulls", "Mavericks", "Rockets", "Timberwolves", "Thunder", "Trail Blazers", "Kings", "Spurs", "Raptors", "Jazz", "Wizards"]
-
-
+arrayOfAbreviations =  ['GSW', 'LAL', 'BRK', 'MIL', 'PHO', 'DEN', 'MIA', 'BOS', 'CLE', 'CHI', 'DAL', 'HOU', 'MIN', 'OKC', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS', 'ATL', 'CHO', 'DET', 'IND', 'LAC', 'MEM', 'NOP', 'NYK', 'ORL', 'PHI']
+arrayOfNames = ['Warriors', 'Lakers', 'Nets', 'Bucks', 'Suns', 'Nuggets', 'Heat', 'Celtics', 'Cavaliers', 'Bulls', 'Mavericks', 'Rockets', 'Timberwolves', 'Thunder', 'Trail Blazers', 'Kings', 'Spurs', 'Raptors', 'Jazz', 'Wizards', 'Hawks', 'Hornets', 'Pistons', 'Pacers', 'Clippers', 'Grizzlies', 'Pelicans', 'Knicks', 'Magic', '76ers']
+counter = 0
 for i in range(len(arrayOfAbreviations)):
     df = scrapeSalaries(arrayOfAbreviations[i])
+    counter += 1
 
     if df is not None:
-        # Display the dataframe
-        import ace_tools as tools; tools.display_dataframe_to_user(name=arrayOfNames[i], dataframe=df)
-        # Save to CSV file
         csv_filename = f"data/{arrayOfNames[i]}Salary.csv"
+        print(csv_filename)
         df.to_csv(csv_filename, index=False)
-        
-    # Add delay between requests
-    time.sleep(3)  # Wait 3 seconds between requests
+    else:
+        print(f"Failed to scrape salaries for {arrayOfNames[i]}")
+
+print(counter)
         

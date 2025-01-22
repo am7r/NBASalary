@@ -191,5 +191,5 @@ for t in holder:
     sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center = segregatingContracts(t) # should be segregating contracts
 
 LEAGUE = NBA(sup, minS, maxS, t1, t2, t3, t4, t5, t6, pg, sg, sf, pf, center)
-#testing.test(LEAGUE)
-#print(calculateStandardDeviation(t5, "PTS"))
+testing.test(LEAGUE)
+print(calculateStandardDeviation(t5, "PTS"))

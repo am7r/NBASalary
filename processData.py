@@ -10,16 +10,13 @@ def processData(teamName):
     dataOne = pd.read_csv(statsOne)
     dataTwo = pd.read_csv(statsTwo)
     dataThree = pd.read_csv(statsThree)
-    salaryData = pd.read_csv(salary, skiprows=1)
+    salaryData = pd.read_csv(salary)
 
     # Merge datasets
     mergeData = pd.merge(dataOne, dataTwo, on='Player')
     mergeData = pd.merge(mergeData, dataThree, on='Player')
     mergeData = pd.merge(mergeData, salaryData, on='Player', how='inner')
 
-
-    # Filter out rows where 'Player' is "team total"
-    mergeData = mergeData[~mergeData['Player'].str.contains('total', case=False, na=False)]
 
     # List of future salary columns to consider
     future_salary_columns = ['2024-25', '2025-26', '2026-27', '2027-28', '2028-29', '2029-30']
