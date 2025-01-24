@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
-
+import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -46,15 +46,23 @@ arrayOfAbreviations =  ['GSW', 'LAL', 'BRK', 'MIL', 'PHO', 'DEN', 'MIA', 'BOS', 
 arrayOfNames = ['Warriors', 'Lakers', 'Nets', 'Bucks', 'Suns', 'Nuggets', 'Heat', 'Celtics', 'Cavaliers', 'Bulls', 'Mavericks', 'Rockets', 'Timberwolves', 'Thunder', 'Trail Blazers', 'Kings', 'Spurs', 'Raptors', 'Jazz', 'Wizards', 'Hawks', 'Hornets', 'Pistons', 'Pacers', 'Clippers', 'Grizzlies', 'Pelicans', 'Knicks', 'Magic', '76ers']
 counter = 0
 for i in range(len(arrayOfAbreviations)):
-    df = scrapeSalaries(arrayOfAbreviations[i])
-    counter += 1
+    if f"{arrayOfNames[i]}Salary.csv" not in os.listdir("data"):
+        df = scrapeSalaries(arrayOfAbreviations[i])
+        counter += 1
 
-    if df is not None:
-        csv_filename = f"data/{arrayOfNames[i]}Salary.csv"
-        print(csv_filename)
-        df.to_csv(csv_filename, index=False)
-    else:
-        print(f"Failed to scrape salaries for {arrayOfNames[i]}")
-
+        if df is not None:
+            csv_filename = f"data/{arrayOfNames[i]}Salary.csv"
+            print(csv_filename)
+            df.to_csv(csv_filename, index=False)
+        else:
+            print(f"Failed to scrape salaries for {arrayOfNames[i]}")
 print(counter)
+check = 0
+for i in range(len(arrayOfNames)):
+    if f"{arrayOfNames[i]}Salary.csv" in os.listdir("data"):
+        check += 1
+if check == len(arrayOfNames):
+    print("All salaries have been scraped")
+
+
         
