@@ -1,10 +1,10 @@
 import pandas as pd
 
 def processData(teamName):
-    statsOne = f"data/{teamName}.csv"
-    statsTwo = f"data/{teamName}2.csv"
-    statsThree = f"data/{teamName}3.csv"
-    salary = f"data/{teamName}Salary.csv"
+    statsOne = f"data/{teamName}/{teamName}.csv"
+    statsTwo = f"data/{teamName}/{teamName}2.csv"
+    statsThree = f"data/{teamName}/{teamName}3.csv"
+    salary = f"data/{teamName}/{teamName}Salary.csv"
 
     # Load data
     dataOne = pd.read_csv(statsOne)
