@@ -75,8 +75,8 @@ counter = 0
 for i in range(len(arrayOfAbreviations)):
     if not os.path.exists(f"data/{arrayOfNames[i]}"):
         os.makedirs(f"data/{arrayOfNames[i]}")
-    #if f"{arrayOfNames[i]}Salary.csv" not in os.listdir("data"):
-    df = scrapeSalaries(arrayOfAbreviations[i])
+    if f"{arrayOfNames[i]}Salary.csv" not in os.listdir(f"data/{arrayOfNames[i]}"):
+        df = scrapeSalaries(arrayOfAbreviations[i])
     #counter += 1
 
     if df is not None:
