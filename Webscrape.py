@@ -66,6 +66,24 @@ def scrapePerGame(team):
 
     return None
 
+def check(arrayOfNames):
+    check = 0
+    for i in range(len(arrayOfNames)):
+        if f"{arrayOfNames[i]}Salary.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
+            check += 1
+    if check == len(arrayOfNames):
+        print("All salaries have been scraped")
+
+    check = 0
+    for i in range(len(arrayOfNames)):
+        if f"{arrayOfNames[i]}.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
+            check += 1
+    if check == len(arrayOfNames):
+        print("All per game stats have been scraped")
+    else:
+        print(f"Only {check} per game stats have been scraped")
+
+
 
 
 arrayOfAbreviations =  ['GSW', 'LAL', 'BRK', 'MIL', 'PHO', 'DEN', 'MIA', 'BOS', 'CLE', 'CHI', 'DAL', 'HOU', 'MIN', 'OKC', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS', 'ATL', 'CHO', 'DET', 'IND', 'LAC', 'MEM', 'NOP', 'NYK', 'ORL', 'PHI']
@@ -78,7 +96,6 @@ for i in range(len(arrayOfAbreviations)):
     df = None
     if f"{arrayOfNames[i]}Salary.csv" not in os.listdir(f"data/{arrayOfNames[i]}"):
         df = scrapeSalaries(arrayOfAbreviations[i])
-    #counter += 1
 
     if df is not None:
         csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}Salary.csv"
@@ -95,27 +112,6 @@ for i in range(len(arrayOfAbreviations)):
     else:
         print(f"Failed to scrape per game for {arrayOfNames[i]}")
 
-#print(counter)
-
-
-
-
-
-check = 0
-for i in range(len(arrayOfNames)):
-    if f"{arrayOfNames[i]}Salary.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
-        check += 1
-if check == len(arrayOfNames):
-    print("All salaries have been scraped")
-
-check = 0
-for i in range(len(arrayOfNames)):
-    if f"{arrayOfNames[i]}.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
-        check += 1
-if check == len(arrayOfNames):
-    print("All per game stats have been scraped")
-else:
-    print(f"Only {check} per game stats have been scraped")
-
+check(arrayOfNames)
 
         
