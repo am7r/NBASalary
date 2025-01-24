@@ -45,17 +45,20 @@ def scrapeSalaries(team):
 arrayOfAbreviations =  ['GSW', 'LAL', 'BRK', 'MIL', 'PHO', 'DEN', 'MIA', 'BOS', 'CLE', 'CHI', 'DAL', 'HOU', 'MIN', 'OKC', 'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS', 'ATL', 'CHO', 'DET', 'IND', 'LAC', 'MEM', 'NOP', 'NYK', 'ORL', 'PHI']
 arrayOfNames = ['Warriors', 'Lakers', 'Nets', 'Bucks', 'Suns', 'Nuggets', 'Heat', 'Celtics', 'Cavaliers', 'Bulls', 'Mavericks', 'Rockets', 'Timberwolves', 'Thunder', 'Trail Blazers', 'Kings', 'Spurs', 'Raptors', 'Jazz', 'Wizards', 'Hawks', 'Hornets', 'Pistons', 'Pacers', 'Clippers', 'Grizzlies', 'Pelicans', 'Knicks', 'Magic', '76ers']
 counter = 0
-for i in range(len(arrayOfAbreviations)):
-    if f"{arrayOfNames[i]}Salary.csv" not in os.listdir("data"):
-        df = scrapeSalaries(arrayOfAbreviations[i])
-        counter += 1
 
-        if df is not None:
-            csv_filename = f"data/{arrayOfNames[i]}Salary.csv"
-            print(csv_filename)
-            df.to_csv(csv_filename, index=False)
-        else:
-            print(f"Failed to scrape salaries for {arrayOfNames[i]}")
+for i in range(len(arrayOfAbreviations)):
+    if not os.path.exists(f"data/{arrayOfNames[i]}"):
+        os.makedirs(f"data/{arrayOfNames[i]}")
+    #if f"{arrayOfNames[i]}Salary.csv" not in os.listdir("data"):
+    df = scrapeSalaries(arrayOfAbreviations[i])
+    counter += 1
+
+    if df is not None:
+        csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}Salary.csv"
+        print(csv_filename)
+        df.to_csv(csv_filename, index=False)
+    else:
+        print(f"Failed to scrape salaries for {arrayOfNames[i]}")
 print(counter)
 check = 0
 for i in range(len(arrayOfNames)):

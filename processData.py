@@ -39,7 +39,7 @@ def processData(teamName):
 
 
     # Save the processed data
-    mergeData.to_csv(f"data/{teamName}MergedData.csv", index=False)
+    mergeData.to_csv(f"data/{teamName}/{teamName}MergedData.csv", index=False)
     print(f"Processed data saved to {teamName}MergedData.csv")
 
 # Process the Warriors data
