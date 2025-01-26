@@ -119,7 +119,9 @@ def scrape(arrayOfNames, arrayOfAbreviations, file):
     if not os.path.exists(f"data/{arrayOfNames[i]}"):
         os.makedirs(f"data/{arrayOfNames[i]}")
     df = None
+    check = False
     if f"{arrayOfNames[i]}{file}.csv" not in os.listdir(f"data/{arrayOfNames[i]}"):
+        check = True
         if file == "Salary":
             df = scrapeSalaries(arrayOfAbreviations[i])
         elif file == "1":
@@ -131,8 +133,10 @@ def scrape(arrayOfNames, arrayOfAbreviations, file):
         csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}{file}.csv"
         print(csv_filename)
         df.to_csv(csv_filename, index=False)
-    else:
+    elif not check:
         print(f"file {file} for {arrayOfNames[i]} already scraped")
+    else:
+        print(f"error with {file} for {arrayOfNames[i]}")
 
 
 
