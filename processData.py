@@ -1,7 +1,7 @@
 import pandas as pd
 
 def processData(teamName):
-    statsOne = f"data/{teamName}/{teamName}.csv"
+    statsOne = f"data/{teamName}/{teamName}1.csv"
     statsTwo = f"data/{teamName}/{teamName}2.csv"
     statsThree = f"data/{teamName}/{teamName}3.csv"
     salary = f"data/{teamName}/{teamName}Salary.csv"

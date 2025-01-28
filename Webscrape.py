@@ -66,22 +66,79 @@ def scrapePerGame(team):
 
     return None
 
+def scrapeColleges(team):
+    url = f"https://www.basketball-reference.com/teams/{team}/2025.html"
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = soup.find("table", id="roster")
+
+        if table:
+                headers = [header.text.strip() for header in table.find("thead").find_all("th")]
+                #headers = headers[]
+
+                rows = []
+                for row in table.find("tbody").find_all("tr"):
+                    cells = [cell.text.strip() for cell in row.find_all(["td", "th"])]
+                    if cells:
+                        rows.append(cells)
+
+                df = pd.DataFrame(rows, columns=headers)
+                return(df)
+        else:
+            print("No table found on the page.")
+    else:
+        print(f"Failed to retrieve the page. Status code: {response.status_code}. Team: {team}")
+
+    return None
+
 def check(arrayOfNames):
+    checkSalaries(arrayOfNames)
+    checkPerGame(arrayOfNames)
+
+def checkSalaries(arrayOfNames):
     check = 0
     for i in range(len(arrayOfNames)):
         if f"{arrayOfNames[i]}Salary.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
             check += 1
     if check == len(arrayOfNames):
         print("All salaries have been scraped")
+    else:
+        print(f"Only {check} salaries have been scraped")
 
+def checkPerGame(arrayOfNames):
     check = 0
     for i in range(len(arrayOfNames)):
-        if f"{arrayOfNames[i]}.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
+        if f"{arrayOfNames[i]}1.csv" in os.listdir(f"data/{arrayOfNames[i]}"):
             check += 1
     if check == len(arrayOfNames):
         print("All per game stats have been scraped")
     else:
         print(f"Only {check} per game stats have been scraped")
+
+def scrape(arrayOfNames, arrayOfAbreviations, file):
+    if not os.path.exists(f"data/{arrayOfNames[i]}"):
+        os.makedirs(f"data/{arrayOfNames[i]}")
+    df = None
+    check = False
+    if f"{arrayOfNames[i]}{file}.csv" not in os.listdir(f"data/{arrayOfNames[i]}"):
+        check = True
+        if file == "Salary":
+            df = scrapeSalaries(arrayOfAbreviations[i])
+        elif file == "1":
+            df = scrapePerGame(arrayOfAbreviations[i])
+        elif file == "3":
+            df = scrapeColleges(arrayOfAbreviations[i])
+
+    if df is not None:
+        csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}{file}.csv"
+        print(csv_filename)
+        df.to_csv(csv_filename, index=False)
+    elif not check:
+        print(f"file {file} for {arrayOfNames[i]} already scraped")
+    else:
+        print(f"error with {file} for {arrayOfNames[i]}")
 
 
 
@@ -91,26 +148,11 @@ arrayOfNames = ['Warriors', 'Lakers', 'Nets', 'Bucks', 'Suns', 'Nuggets', 'Heat'
 counter = 0
 
 for i in range(len(arrayOfAbreviations)):
-    if not os.path.exists(f"data/{arrayOfNames[i]}"):
-        os.makedirs(f"data/{arrayOfNames[i]}")
-    df = None
-    if f"{arrayOfNames[i]}Salary.csv" not in os.listdir(f"data/{arrayOfNames[i]}"):
-        df = scrapeSalaries(arrayOfAbreviations[i])
-
-    if df is not None:
-        csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}Salary.csv"
-        print(csv_filename)
-        df.to_csv(csv_filename, index=False)
-    else:
-        print(f"Failed to scrape salaries for {arrayOfNames[i]}")
+    scrape(arrayOfNames, arrayOfAbreviations, "Salary")
+    #scrape(arrayOfNames, arrayOfAbreviations, "1")
+    #scrape(arrayOfNames, arrayOfAbreviations, "3")
+    #scrape(arrayOfNames, arrayOfAbreviations, "3")
     
-    df = scrapePerGame(arrayOfAbreviations[i])
-    if df is not None:
-        csv_filename = f"data/{arrayOfNames[i]}/{arrayOfNames[i]}.csv"
-        print(csv_filename)
-        df.to_csv(csv_filename, index=False)
-    else:
-        print(f"Failed to scrape per game for {arrayOfNames[i]}")
 
 check(arrayOfNames)
 
