@@ -104,6 +104,8 @@ def checkSalaries(arrayOfNames):
             check += 1
     if check == len(arrayOfNames):
         print("All salaries have been scraped")
+    else:
+        print(f"Only {check} salaries have been scraped")
 
 def checkPerGame(arrayOfNames):
     check = 0
@@ -147,8 +149,8 @@ counter = 0
 
 for i in range(len(arrayOfAbreviations)):
     scrape(arrayOfNames, arrayOfAbreviations, "Salary")
-    scrape(arrayOfNames, arrayOfAbreviations, "1")
-    scrape(arrayOfNames, arrayOfAbreviations, "3")
+    #scrape(arrayOfNames, arrayOfAbreviations, "1")
+    #scrape(arrayOfNames, arrayOfAbreviations, "3")
     #scrape(arrayOfNames, arrayOfAbreviations, "3")
     
 
