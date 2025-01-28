@@ -72,7 +72,7 @@ def scrapeColleges(team):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, "html.parser")
-        table = soup.find("table", id="per_game_stats")
+        table = soup.find("table", id="roster")
 
         if table:
                 headers = [header.text.strip() for header in table.find("thead").find_all("th")]
